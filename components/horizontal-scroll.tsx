@@ -54,12 +54,12 @@ const works: Ministries[] = [
 
 export function ScrollAreaHorizontalDemo() {
   return (
-    <ScrollArea className="w-[1190px] whitespace-nowrap">
+    <ScrollArea className="w-full whitespace-nowrap">
       <div className="flex w-max space-x-4 p-4">
         {works.map((i) => (
-          <figure key={i.title} className="shrink-0 w-[378px]">
-            <figcaption className="relative w-[378px] h-[550px] mx-auto rounded-[14px] bg-gray-100 overflow-hidden">
-              <span className="absolute top-0 left-0 block w-[378px] h-[296px] bg-[#6F6B6B]" />
+          <figure key={i.title} className="shrink-0 w-[280px] sm:w-[340px] md:w-[360px] lg:w-[378px]">
+            <figcaption className="relative w-full h-[550px] mx-auto rounded-[14px] bg-gray-100 overflow-hidden">
+              <span className="absolute top-0 left-0 block w-full h-[220px] sm:h-[260px] md:h-[280px] lg:h-[296px] bg-[#6F6B6B]" />
               <span className="absolute left-4 top-[316px] block text-black text-[28px] font-lora font-bold text-left pr-4 whitespace-normal break-words">
                 {i.title}
               </span>

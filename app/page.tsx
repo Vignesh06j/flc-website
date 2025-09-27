@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -23,7 +23,7 @@ type YTThumbnail = {
 
 type YTSnippet = {
   title: string;
-  thumbnails: { maxres: YTThumbnail };
+  thumbnails: { maxres?: YTThumbnail; medium?: YTThumbnail };
   resourceId: { videoId: string };
 };
 
@@ -40,6 +40,16 @@ const YouTubeGrid: React.FC<YouTubeGridProps> = ({ onTotalVideos, maxResults = '
   const [data, setData] = useState<YTResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Staggered reveal for video cards as the grid enters the viewport
+  const containerVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.12 } },
+  } as const;
+  const itemVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
+  } as const;
 
   useEffect(() => {
     let active = true;
@@ -86,11 +96,13 @@ const YouTubeGrid: React.FC<YouTubeGridProps> = ({ onTotalVideos, maxResults = '
       <div className="mt-10 w-full max-w-5xl mx-auto text-center text-slate-500">Loading latest messages…</div>
     );
   }
+
   if (error) {
     return (
       <div className="mt-10 w-full max-w-5xl mx-auto text-center text-red-600">{error}</div>
     );
   }
+
   if (!data || !data.items?.length) {
     return (
       <div className="mt-10 w-full max-w-5xl mx-auto text-center text-slate-500">No messages available.</div>
@@ -98,34 +110,47 @@ const YouTubeGrid: React.FC<YouTubeGridProps> = ({ onTotalVideos, maxResults = '
   }
 
   // Filter out any items without a usable maxres thumbnail URL
-  const itemsWithThumb = data.items.filter((it) => !!it?.snippet?.thumbnails?.maxres?.url)
+  const itemsWithThumb = data.items.filter((it) => {
+    const t = it?.snippet?.thumbnails;
+    return !!(t?.maxres?.url || t?.medium?.url);
+  });
   if (!itemsWithThumb.length) {
     return (
       <div className="mt-10 w-full max-w-5xl mx-auto text-center text-slate-500">No messages available.</div>
     );
   }
-  const lastTwo = itemsWithThumb.length > 1 ? itemsWithThumb.slice(-2) : itemsWithThumb
+
+  const lastTwo = itemsWithThumb.length > 1 ? itemsWithThumb.slice(-2) : itemsWithThumb;
+
   return (
-    <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+    <motion.div
+      className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full"
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: false, amount: 0.2 }}
+    >
       {lastTwo.map(({ id, snippet }) => {
         const { title, thumbnails, resourceId } = snippet;
-        const maxres = thumbnails?.maxres
-        if (!maxres?.url) return null
-        const href = `https://www.youtube.com/watch?v=${resourceId.videoId}`;
+        const thumb = thumbnails?.maxres?.url ? thumbnails.maxres : thumbnails?.medium;
+        if (!thumb?.url) return null;
+        const videoId = resourceId?.videoId || id;
+        const href = `https://www.youtube.com/watch?v=${videoId}`;
         return (
-          <a
-            key={id}
+          <motion.a
+            key={videoId}
             href={href}
             target="_blank"
             rel="noopener noreferrer"
             className="group rounded-lg overflow-hidden border border-slate-200 hover:shadow-lg transition"
             aria-label={title}
+            variants={itemVariants}
           >
             <div className="aspect-video bg-slate-100 overflow-hidden">
               <img
-                src={maxres.url}
-                width={maxres.width}
-                height={maxres.height}
+                src={thumb.url}
+                width={thumb.width}
+                height={thumb.height}
                 alt={title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
@@ -135,10 +160,10 @@ const YouTubeGrid: React.FC<YouTubeGridProps> = ({ onTotalVideos, maxResults = '
               <h3 className="text-slate-900 font-semibold line-clamp-2">{title}</h3>
               <p className="mt-1 text-sm text-green-600">Watch on YouTube →</p>
             </div>
-          </a>
+          </motion.a>
         );
       })}
-    </div>
+    </motion.div>
   );
 };
 
@@ -293,13 +318,23 @@ const LandingPage = () => {
   )
 
 
+  // Scroll-linked parallax for hero
+  const heroRef = React.useRef<HTMLDivElement | null>(null)
+  const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ["start end", "end start"] })
+  const heroY = useTransform(heroProgress, [0, 1], [0, -60])
+
+  // Subtle parallax for Values heading
+  const valuesRef = React.useRef<HTMLDivElement | null>(null)
+  const { scrollYProgress: valuesProgress } = useScroll({ target: valuesRef, offset: ["start end", "end start"] })
+  const valuesY = useTransform(valuesProgress, [0, 1], [0, -30])
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navigation Bar */}
       <Navbar />
 
       {/* Hero Section (updated, full-screen) */}
-      <section id="home" className="bg-[#979797]">
+      <section id="home" className="bg-[#979797]" ref={heroRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex min-h-screen items-center">
             <motion.div
@@ -307,9 +342,10 @@ const LandingPage = () => {
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
+              style={{ y: heroY }}
             >
               <motion.h1
-                className="font-lora font-bold text-white leading-tight max-w-[844px] text-[40px] sm:text-[48px] lg:text-[60px]"
+                className="font-lora font-bold text-white leading-tight max-w-[844px] text-[32px] sm:text-[44px] lg:text-[60px]"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
@@ -533,10 +569,10 @@ const LandingPage = () => {
       </section>
 
       {/* Our Values */}
-      <section id="values" className="bg-white h-[625px] flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <section id="values" className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full" ref={valuesRef}>
           <div className="flex flex-col items-center text-center w-full">
-            <h2 className="text-[56px] leading-tight font-bold font-lora tracking-[2px] text-[#1F1F1F]">OUR VALUES</h2>
+            <motion.h2 style={{ y: valuesY }} className="text-[36px] sm:text-[44px] lg:text-[56px] leading-tight font-bold font-lora tracking-[2px] text-[#1F1F1F]">OUR VALUES</motion.h2>
             <p className="mt-3 text-[18px] text-black font-work-sans max-w-[804px]">
               Our Core Values are who we are. They are not just what we do, they are part of our DNA.
             </p>
@@ -547,12 +583,18 @@ const LandingPage = () => {
                   <CarouselContent>
                     {values.map((v, idx) => (
                       <CarouselItem key={idx} className="basis-full md:basis-1/2 lg:basis-1/3">
-                        <div className="relative w-[384px] h-[220px] mx-auto rounded-[12px] border-2 border-gray-400 overflow-hidden">
+                        <motion.div
+                          initial={{ opacity: 0, y: 24 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.25 }}
+                          transition={{ duration: 0.45, ease: 'easeOut' }}
+                          className="relative w-[384px] h-[220px] mx-auto rounded-[12px] border-2 border-gray-400 overflow-hidden"
+                        >
                           <div className="absolute top-3 left-3 w-[45px] h-[45px] bg-[#1F1F1F] rounded-full" />
                           <div className="absolute top-5 left-6 text-white text-[18px] font-work-sans font-bold">{v.number}</div>
                           <div className="absolute left-7 top-16 w-[300px] text-[#1F1F1F] text-[24px] font-lora font-semibold">{v.title}</div>
                           <div className="absolute left-7 top-[139px] w-[336px] text-black text-[12px] font-work-sans leading-snug">{v.description}</div>
-                        </div>
+                        </motion.div>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
@@ -576,7 +618,7 @@ const LandingPage = () => {
       <section id="ministries" className="bg-[#1F1F1F] py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex flex-col items-center text-center w-full">
-            <h2 className="text-[60px] leading-tight font-bold font-lora text-white">OUR MINISTRIES</h2>
+            <h2 className="text-[36px] sm:text-[44px] lg:text-[60px] leading-tight font-bold font-lora text-white">OUR MINISTRIES</h2>
             <div className="mt-12 w-full">
               <div className="relative mx-auto max-w-[1236px]">
                 <ScrollAreaHorizontalDemo />
