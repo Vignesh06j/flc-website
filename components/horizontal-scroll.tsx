@@ -57,26 +57,28 @@ export function ScrollAreaHorizontalDemo() {
     <ScrollArea className="w-full whitespace-nowrap">
       <div className="flex w-max space-x-4 p-4">
         {works.map((i) => (
-          <figure key={i.title} className="shrink-0 w-[280px] sm:w-[340px] md:w-[360px] lg:w-[378px]">
-            <figcaption className="relative w-full h-[550px] mx-auto rounded-[14px] bg-gray-100 overflow-hidden">
-              <span className="absolute top-0 left-0 block w-full h-[220px] sm:h-[260px] md:h-[280px] lg:h-[296px] bg-[#6F6B6B]" />
-              <span className="absolute left-4 top-[316px] block text-black text-[28px] font-lora font-bold text-left pr-4 whitespace-normal break-words">
-                {i.title}
-              </span>
-              <span className="absolute left-4 top-[364px] block text-left pr-4">
-                <span className="block text-[15px] font-lora font-semibold text-black whitespace-normal break-words">{i.timingsLabel}</span>
-                <span className="block text-[14px] font-lora font-normal text-black whitespace-normal break-words">
-                  {i.timings.map((t, idx) => (
-                    <span key={idx} className="block">{t}</span>
-                  ))}
-                </span>
-              </span>
-              <span className="absolute left-4 top-[428px] block text-[10px] font-lora font-semibold text-black text-left pr-4 whitespace-normal break-words">
-                {i.scripture}
-              </span>
-              <span className="absolute left-4 top-[452px] block w-[341px] text-[12px] font-lora font-normal text-black text-left pr-4 leading-snug whitespace-normal break-words">
-                {i.description}
-              </span>
+          <figure key={i.title} className="shrink-0 w-[378px]">
+            <figcaption className="relative w-[378px] h-[550px] mx-auto rounded-[14px] bg-gray-100 overflow-hidden flex flex-col">
+              <div className="w-full bg-[#6F6B6B] h-[296px] shrink-0" />
+              <div className="flex-1 p-4 text-left flex flex-col gap-2">
+                <h3 className="text-[24px] font-lora font-bold text-black leading-tight break-words line-clamp-2">
+                  {i.title}
+                </h3>
+                <div>
+                  <div className="text-[15px] font-lora font-semibold text-black">{i.timingsLabel}</div>
+                  <div className="text-[14px] font-lora font-normal text-black leading-snug line-clamp-2">
+                    {i.timings.map((t, idx) => (
+                      <div key={idx}>{t}</div>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-[11px] font-lora font-semibold text-black leading-snug line-clamp-2">
+                  {i.scripture}
+                </div>
+                <p className="text-[12px] font-lora font-normal text-black leading-snug line-clamp-4">
+                  {i.description}
+                </p>
+              </div>
             </figcaption>
           </figure>
         ))}

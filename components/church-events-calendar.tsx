@@ -147,14 +147,14 @@ const ChurchEventsCalendar: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-8" style={{ backgroundColor: '#EAC6B7' }}>
-      <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">UPCOMING EVENTS</h1>
-      
+    <div className="w-full max-w-5xl mx-auto p-6 sm:p-8" style={{ backgroundColor: '#EAC6B7' }}>
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-900 mb-6 sm:mb-8">UPCOMING EVENTS</h1>
+
       <Card className="bg-white shadow-lg">
         <CardContent className="p-6">
-          <div className="flex gap-6">
+          <div className="flex flex-col md:flex-row gap-6">
             {/* Calendar Section */}
-            <div className="w-80 pr-6 border-r border-gray-200">
+            <div className="w-full md:w-80 md:pr-6 pr-0 md:pb-0 pb-6 border-b md:border-b-0 md:border-r border-gray-200">
               <Calendar
                 mode="single"
                 selected={selectedDate}
@@ -175,7 +175,7 @@ const ChurchEventsCalendar: React.FC = () => {
             </div>
             
             {/* Events Section */}
-            <div className="flex-1 pl-6">
+            <div className="flex-1 md:pl-6 pl-0">
               {selectedDate && (
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -187,7 +187,7 @@ const ChurchEventsCalendar: React.FC = () => {
                 </div>
               )}
               
-              <div className="h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
+              <div className="h-64 sm:h-72 md:h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
                 <div className="space-y-6 pr-2">
                   {selectedEvents.length > 0 ? (
                     selectedEvents.map((event) => (

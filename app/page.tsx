@@ -580,15 +580,15 @@ const LandingPage = () => {
             <div className="mt-10 w-full">
               <div className="relative mx-auto max-w-[1236px]" onMouseEnter={() => setValuesHover(true)} onMouseLeave={() => setValuesHover(false)}>
                 <Carousel opts={{ align: 'start', loop: true }} setApi={setValuesApi} className="w-full">
-                  <CarouselContent>
+                  <CarouselContent className="-ml-4 lg:-ml-4">
                     {values.map((v, idx) => (
-                      <CarouselItem key={idx} className="basis-full md:basis-1/2 lg:basis-1/3">
+                      <CarouselItem key={idx} className="basis-full lg:basis-1/3 pl-4">
                         <motion.div
                           initial={{ opacity: 0, y: 24 }}
                           whileInView={{ opacity: 1, y: 0 }}
                           viewport={{ once: true, amount: 0.25 }}
                           transition={{ duration: 0.45, ease: 'easeOut' }}
-                          className="relative w-[384px] h-[220px] mx-auto rounded-[12px] border-2 border-gray-400 overflow-hidden"
+                          className="relative w-full max-w-[384px] h-[220px] mx-auto rounded-[12px] border-2 border-gray-400 overflow-hidden"
                         >
                           <div className="absolute top-3 left-3 w-[45px] h-[45px] bg-[#1F1F1F] rounded-full" />
                           <div className="absolute top-5 left-6 text-white text-[18px] font-work-sans font-bold">{v.number}</div>
