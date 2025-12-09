@@ -333,10 +333,26 @@ const LandingPage = () => {
       {/* Navigation Bar */}
       <Navbar />
 
-      {/* Hero Section (updated, full-screen) */}
-      <section id="home" className="bg-[#979797]" ref={heroRef}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex min-h-screen items-center">
+      {/* Hero Section with responsive background video */}
+      <section
+        id="home"
+        ref={heroRef}
+        className="relative min-h-screen overflow-hidden bg-black"
+      >
+        <video
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-hidden="true"
+        >
+          <source src="/hero_vid.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex min-h-screen items-center py-16 sm:py-20">
             <motion.div
               className="text-left md:max-w-3xl space-y-6 md:space-y-8"
               initial={{ opacity: 0, x: -50 }}
