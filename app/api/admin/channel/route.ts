@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verifySessionToken, COOKIE_NAME } from '@/lib/auth'
-import { getChannelId, setChannelId } from '@/lib/channel-config'
+import { getPlaylistId, setPlaylistId } from '@/lib/channel-config'
 
 async function isAuthenticated(): Promise<boolean> {
   const store = await cookies()
@@ -13,7 +13,7 @@ export async function GET() {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  return NextResponse.json({ channelId: getChannelId() })
+  return NextResponse.json({ playlistId: getPlaylistId() })
 }
 
 export async function POST(request: Request) {
@@ -21,12 +21,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { channelId } = (await request.json()) as { channelId?: string }
+  const { playlistId } = (await request.json()) as { playlistId?: string }
 
-  if (!channelId || typeof channelId !== 'string' || !channelId.trim()) {
-    return NextResponse.json({ error: 'Invalid channelId' }, { status: 400 })
+  if (!playlistId || typeof playlistId !== 'string' || !playlistId.trim()) {
+    return NextResponse.json({ error: 'Invalid playlistId' }, { status: 400 })
   }
 
-  setChannelId(channelId.trim())
+  setPlaylistId(playlistId.trim())
   return NextResponse.json({ success: true })
 }

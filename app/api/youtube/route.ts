@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getChannelId } from '@/lib/channel-config'
+import { getPlaylistId } from '@/lib/channel-config'
 
 const YOUTUBE_PLAYLIST_ITEMS_API =
   'https://www.googleapis.com/youtube/v3/playlistItems'
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const playlistId =
-      searchParams.get('playlistId') || 'PLsSk_koSv6O-KdS-GgVcG8B2GJ4FEQh4V'
+      searchParams.get('playlistId') || getPlaylistId()
     const maxResults = Number(searchParams.get('maxResults'))
     const latest = searchParams.get('latest') === 'true'
 
@@ -51,8 +51,7 @@ export async function GET(request: Request) {
     // If latest=true, prefer using Search API ordered by date for a channel
     // This avoids walking playlist pages to get the last N items
     if (latest) {
-      const channelId =
-        searchParams.get('channelId') || getChannelId()
+      const channelId = searchParams.get('channelId')
 
       if (channelId) {
         const searchUrl = `${YOUTUBE_SEARCH_API}?part=snippet&order=date&type=video&channelId=${encodeURIComponent(

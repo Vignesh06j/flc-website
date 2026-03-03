@@ -14,6 +14,7 @@ import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/com
 import { ScrollAreaHorizontalDemo } from '@/components/horizontal-scroll';
 import ChurchEventsCalendar from '@/components/church-events-calendar';
 import { useEffect, useState } from 'react';
+import { PastoralTeam } from '@/components/ui/pastoral-team';
 
 type YTThumbnail = {
   url: string;
@@ -581,6 +582,16 @@ const LandingPage = () => {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Pastoral Team */}
+      <section id="pastoral" className="bg-gray-100 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="flex flex-col items-center text-center w-full">
+            <h2 className="text-[36px] sm:text-[44px] lg:text-[56px] leading-tight font-bold font-lora tracking-[2px] text-[#1F1F1F]">PASTORAL TEAM</h2>
+          </div>
+          <PastoralTeam />
         </div>
       </section>
 

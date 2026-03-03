@@ -8,17 +8,17 @@ export default function AdminPage() {
   const [view, setView] = useState<View>('loading')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
-  const [channelId, setChannelId] = useState('')
-  const [draftChannelId, setDraftChannelId] = useState('')
+  const [playlistId, setPlaylistId] = useState('')
+  const [draftPlaylistId, setDraftPlaylistId] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
 
-  const fetchChannelId = useCallback(async () => {
+  const fetchPlaylistId = useCallback(async () => {
     const res = await fetch('/api/admin/channel')
     if (res.ok) {
-      const data = (await res.json()) as { channelId: string }
-      setChannelId(data.channelId)
-      setDraftChannelId(data.channelId)
+      const data = (await res.json()) as { playlistId: string }
+      setPlaylistId(data.playlistId)
+      setDraftPlaylistId(data.playlistId)
       setView('dashboard')
     } else {
       setView('login')
@@ -26,8 +26,8 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    fetchChannelId()
-  }, [fetchChannelId])
+    fetchPlaylistId()
+  }, [fetchPlaylistId])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -41,7 +41,7 @@ export default function AdminPage() {
 
     if (res.ok) {
       setPassword('')
-      await fetchChannelId()
+      await fetchPlaylistId()
     } else {
       setLoginError('Incorrect password.')
       setPassword('')
@@ -51,8 +51,8 @@ export default function AdminPage() {
   async function handleLogout() {
     await fetch('/api/admin/logout', { method: 'POST' })
     setView('login')
-    setChannelId('')
-    setDraftChannelId('')
+    setPlaylistId('')
+    setDraftPlaylistId('')
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -63,11 +63,11 @@ export default function AdminPage() {
     const res = await fetch('/api/admin/channel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ channelId: draftChannelId }),
+      body: JSON.stringify({ playlistId: draftPlaylistId }),
     })
 
     if (res.ok) {
-      setChannelId(draftChannelId)
+      setPlaylistId(draftPlaylistId)
       setSaveMessage('Saved!')
     } else {
       setSaveMessage('Failed to save. Please try again.')
@@ -143,20 +143,20 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* YouTube Channel ID card */}
+        {/* YouTube Playlist ID card */}
         <div className="bg-white shadow-sm rounded-xl p-6">
           <h2 className="text-base font-semibold text-gray-800 mb-1">
-            YouTube Channel ID
+            YouTube Playlist ID
           </h2>
           <p className="text-sm text-gray-500 mb-5">
-            Used to fetch the latest videos on the Sermons page.
+            Used to fetch videos on the Sermons page.
           </p>
 
-          {channelId && (
+          {playlistId && (
             <p className="text-xs text-gray-400 mb-4">
               Current:{' '}
               <span className="font-mono text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
-                {channelId}
+                {playlistId}
               </span>
             </p>
           )}
@@ -164,20 +164,20 @@ export default function AdminPage() {
           <form onSubmit={handleSave} className="space-y-4">
             <div>
               <label
-                htmlFor="channelId"
+                htmlFor="playlistId"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Channel ID
+                Playlist ID
               </label>
               <input
-                id="channelId"
+                id="playlistId"
                 type="text"
-                value={draftChannelId}
+                value={draftPlaylistId}
                 onChange={(e) => {
-                  setDraftChannelId(e.target.value)
+                  setDraftPlaylistId(e.target.value)
                   setSaveMessage('')
                 }}
-                placeholder="UCxxxxxxxxxxxxxxxxxxxx"
+                placeholder="PLxxxxxxxxxxxxxxxxxxxx"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
                 spellCheck={false}
@@ -198,7 +198,7 @@ export default function AdminPage() {
 
             <button
               type="submit"
-              disabled={saving || draftChannelId === channelId}
+              disabled={saving || draftPlaylistId === playlistId}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
             >
               {saving ? 'Saving…' : 'Save'}
