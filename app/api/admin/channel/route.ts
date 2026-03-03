@@ -13,7 +13,7 @@ export async function GET() {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  return NextResponse.json({ playlistId: getPlaylistId() })
+  return NextResponse.json({ playlistId: await getPlaylistId() })
 }
 
 export async function POST(request: Request) {
@@ -27,6 +27,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid playlistId' }, { status: 400 })
   }
 
-  setPlaylistId(playlistId.trim())
+  await setPlaylistId(playlistId.trim())
   return NextResponse.json({ success: true })
 }

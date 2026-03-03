@@ -1,22 +1,33 @@
-import fs from 'node:fs'
-import path from 'node:path'
+import { put, list } from '@vercel/blob'
 
-const CONFIG_PATH = path.join(process.cwd(), 'data', 'channel.json')
+const BLOB_PATHNAME = 'flc-config/playlist-id.json'
 
-export function getPlaylistId(): string {
+/**
+ * Reads the playlist ID from Vercel Blob.
+ * Falls back to YOUTUBE_PLAYLIST_ID env var if the blob doesn't exist yet.
+ */
+export async function getPlaylistId(): Promise<string> {
   try {
-    const raw = fs.readFileSync(CONFIG_PATH, 'utf-8')
-    const data = JSON.parse(raw) as { playlistId?: string }
-    return data.playlistId ?? ''
+    const { blobs } = await list({ prefix: 'flc-config/playlist-id' })
+    if (!blobs.length) return process.env.YOUTUBE_PLAYLIST_ID ?? ''
+
+    const res = await fetch(blobs[0].url, { cache: 'no-store' })
+    if (!res.ok) return process.env.YOUTUBE_PLAYLIST_ID ?? ''
+
+    const data = (await res.json()) as { playlistId?: string }
+    return data.playlistId ?? process.env.YOUTUBE_PLAYLIST_ID ?? ''
   } catch {
-    return ''
+    return process.env.YOUTUBE_PLAYLIST_ID ?? ''
   }
 }
 
-export function setPlaylistId(playlistId: string): void {
-  const dir = path.dirname(CONFIG_PATH)
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true })
-  }
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify({ playlistId }, null, 2), 'utf-8')
+/**
+ * Uploads/overwrites the playlist ID blob in Vercel Blob storage.
+ */
+export async function setPlaylistId(playlistId: string): Promise<void> {
+  await put(BLOB_PATHNAME, JSON.stringify({ playlistId }), {
+    access: 'public',
+    allowOverwrite: true,
+    contentType: 'application/json',
+  })
 }

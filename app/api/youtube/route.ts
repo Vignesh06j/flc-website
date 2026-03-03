@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const playlistId =
-      searchParams.get('playlistId') || getPlaylistId()
+      searchParams.get('playlistId') || await getPlaylistId()
     const maxResults = Number(searchParams.get('maxResults'))
     const latest = searchParams.get('latest') === 'true'
 
