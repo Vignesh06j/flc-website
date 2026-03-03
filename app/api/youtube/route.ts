@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getChannelId } from '@/lib/channel-config'
 
 const YOUTUBE_PLAYLIST_ITEMS_API =
   'https://www.googleapis.com/youtube/v3/playlistItems'
@@ -51,7 +52,7 @@ export async function GET(request: Request) {
     // This avoids walking playlist pages to get the last N items
     if (latest) {
       const channelId =
-        searchParams.get('channelId') || process.env.YOUTUBE_CHANNEL_ID
+        searchParams.get('channelId') || getChannelId()
 
       if (channelId) {
         const searchUrl = `${YOUTUBE_SEARCH_API}?part=snippet&order=date&type=video&channelId=${encodeURIComponent(
