@@ -485,14 +485,6 @@ const LandingPage = () => {
               ]}
             />
             <ServicesCard
-              title="English Service"
-              subtitle="Every Sunday, 11:30 am - 1:00 pm"
-              addressLines={[
-                'L - 16, South Extension II, Block L, New Delhi,',
-                'Delhi 110049',
-              ]}
-            />
-            <ServicesCard
               title="Hindi Service"
               subtitle="Every Wednesday, 7:00 pm - 8:30 pm"
               addressLines={[
